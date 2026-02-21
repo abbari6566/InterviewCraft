@@ -9,3 +9,7 @@ suggests tailored answers, and provides feedback on practice responses.
 - Node.js + Express
 - PostgreSQL + Prisma
 - OpenAI API
+
+## Demo
+
+![InterviewCraft Demo](./demo.jpg)
