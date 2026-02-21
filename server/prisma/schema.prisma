@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  chats        Chat[] //user has many chats, this is virtual not actual column in User table
+}
+
+
+model Chat {
+  id             String    @id @default(uuid())
+  userId         String
+  jobTitle       String
+  jobDescription String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages       Message[] //chat has many messages
+
+  @@index([userId])
+}
+
+
+model Message {
+  id        String   @id @default(uuid())
+  chatId    String
+  role      String   // user/assistant/system
+  content   String
+  createdAt DateTime @default(now())
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@index([chatId])
+}
+
