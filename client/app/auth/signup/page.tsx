@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { login, register } from "@/lib/api";
+import { setToken } from "@/lib/auth";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -20,7 +21,8 @@ export default function SignupPage() {
 
     try {
       await register({ name, email, password });
-      await login({ email, password });
+      const token = await login({ email, password });
+      setToken(token);
       router.push("/dashboard");
     } catch {
       setError("Signup failed. Try a different email.");

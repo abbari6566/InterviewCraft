@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getToken } from "./auth";
 
 export type User = {
   id: string;
@@ -56,6 +57,15 @@ const baseURL =
 
 const client = axios.create({ baseURL, withCredentials: true });
 
+client.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+
+  return config;
+});
+
 export const register = async (payload: {
   name: string;
   email: string;
@@ -65,7 +75,8 @@ export const register = async (payload: {
 };
 
 export const login = async (payload: { email: string; password: string }) => {
-  await client.post("/auth/login", payload);
+  const { data } = await client.post<{ token: string }>("/auth/login", payload);
+  return data.token;
 };
 
 export const logout = async () => {

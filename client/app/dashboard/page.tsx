@@ -17,6 +17,7 @@ import {
   me,
   sendMessage,
 } from "@/lib/api";
+import { clearToken } from "@/lib/auth";
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleString(undefined, {
@@ -116,6 +117,7 @@ export default function DashboardPage() {
   }, [router]);
 
   const handleLogout = async () => {
+    clearToken();
     try {
       await logout();
     } catch {

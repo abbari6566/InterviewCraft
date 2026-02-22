@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { login } from "@/lib/api";
+import { setToken } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -18,7 +19,8 @@ export default function LoginPage() {
     setPending(true);
 
     try {
-      await login({ email, password });
+      const token = await login({ email, password });
+      setToken(token);
       router.push("/dashboard");
     } catch {
       setError("Login failed. Check your credentials.");

@@ -36,7 +36,7 @@ export const login = async (req: Request, res: Response) => {
     const { email, password } = req.body;
     const token = await loginUser(email, password);
     res.cookie(TOKEN_COOKIE_NAME, token, getCookieConfig());
-    res.json({ ok: true });
+    res.json({ ok: true, token });
   } catch (err: any) {
     res.status(401).json({ error: err.message });
   }
