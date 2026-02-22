@@ -4,13 +4,18 @@ import prisma from "../config/prisma";
 
 const TOKEN_COOKIE_NAME = "interviewcraft_token";
 
-const getCookieConfig = () => ({
-  httpOnly: true,
-  sameSite: "lax" as const,
-  secure: process.env.NODE_ENV === "production",
-  path: "/",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-});
+const getCookieConfig = () => {
+  const isProduction = process.env.NODE_ENV === "production";
+  const sameSite: "none" | "lax" = isProduction ? "none" : "lax";
+
+  return {
+    httpOnly: true,
+    sameSite,
+    secure: isProduction,
+    path: "/",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  };
+};
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -38,10 +43,13 @@ export const login = async (req: Request, res: Response) => {
 };
 
 export const logout = async (_req: Request, res: Response) => {
+  const isProduction = process.env.NODE_ENV === "production";
+  const sameSite: "none" | "lax" = isProduction ? "none" : "lax";
+
   res.clearCookie(TOKEN_COOKIE_NAME, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    sameSite,
+    secure: isProduction,
     path: "/",
   });
   res.json({ ok: true });
