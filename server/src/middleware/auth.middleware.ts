@@ -4,21 +4,41 @@ import { env } from "../config/env";
 
 const JWT_SECRET = env.JWT_SECRET;
 
+const parseCookie = (headerValue: string | undefined, key: string) => {
+  if (!headerValue) {
+    return null;
+  }
+
+  const match = headerValue
+    .split(";")
+    .map((part) => part.trim())
+    .find((part) => part.startsWith(`${key}=`));
+
+  if (!match) {
+    return null;
+  }
+
+  return decodeURIComponent(match.slice(key.length + 1));
+};
+
+const TOKEN_COOKIE_NAME = "interviewcraft_token";
+
 export const requireAuth = (
   req: Request,
   res: Response,
   next: NextFunction,
 ) => {
   const authHeader = req.headers.authorization;
-
-  if (!authHeader) {
-    return res.status(401).json({ error: "Missing Authorization header" });
+  const bearerToken =
+    authHeader && authHeader.startsWith("Bearer ")
+      ? authHeader.split(" ")[1]
+      : null;
+  const cookieToken = parseCookie(req.headers.cookie, TOKEN_COOKIE_NAME);
+  const token = bearerToken || cookieToken;
+  if (!token) {
+    return res.status(401).json({ error: "Unauthorized" });
   }
 
-  if (!authHeader.startsWith("Bearer ")) {
-    return res.status(401).json({ error: "Invalid Authorization format" });
-  }
-  const token = authHeader.split(" ")[1];
   try {
     const payload = jwt.verify(token, JWT_SECRET) as { userId: string };
     // attach trusted user identity to request

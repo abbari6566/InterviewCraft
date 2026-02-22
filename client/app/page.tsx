@@ -2,18 +2,22 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getToken } from "@/lib/auth";
+import { me } from "@/lib/api";
 
 export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    if (getToken()) {
-      router.replace("/dashboard");
-      return;
-    }
+    const checkSession = async () => {
+      try {
+        await me();
+        router.replace("/dashboard");
+      } catch {
+        router.replace("/auth/login");
+      }
+    };
 
-    router.replace("/auth/login");
+    void checkSession();
   }, [router]);
 
   return null;

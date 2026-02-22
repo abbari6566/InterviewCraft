@@ -9,12 +9,21 @@ import {
   jobInsightsRequestSchema,
   resumeFeedbackRequestSchema,
 } from "../schemas/insights.schema";
+import { createRateLimit } from "../middleware/rate-limit.middleware";
 
 const router = Router();
+const insightsRateLimit = createRateLimit({ windowMs: 5 * 60 * 1000, max: 30 });
 
-router.post("/job", requireAuth, validateBody(jobInsightsRequestSchema), getJobInsightsHandler);
+router.post(
+  "/job",
+  insightsRateLimit,
+  requireAuth,
+  validateBody(jobInsightsRequestSchema),
+  getJobInsightsHandler,
+);
 router.post(
   "/resume",
+  insightsRateLimit,
   requireAuth,
   validateBody(resumeFeedbackRequestSchema),
   getResumeFeedbackHandler,

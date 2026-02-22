@@ -10,6 +10,7 @@ const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(5000),
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
   JWT_SECRET: z.string().min(1, "JWT_SECRET is required"),
+  CORS_ORIGIN: z.string().default("http://localhost:3000"),
   OPENAI_API_KEY: z.string().min(1, "OPENAI_API_KEY is required").optional(),
 });
 

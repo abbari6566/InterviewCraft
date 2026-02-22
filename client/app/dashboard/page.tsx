@@ -13,10 +13,10 @@ import {
   getJobInsights,
   getResumeFeedback,
   listChats,
+  logout,
   me,
   sendMessage,
 } from "@/lib/api";
-import { clearToken, getToken } from "@/lib/auth";
 
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleString(undefined, {
@@ -100,19 +100,12 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    const token = getToken();
-    if (!token) {
-      router.replace("/auth/login");
-      return;
-    }
-
     const bootstrap = async () => {
       try {
         const currentUser = await me();
         setUser(currentUser);
         await refreshChats();
       } catch {
-        clearToken();
         router.replace("/auth/login");
       } finally {
         setBooting(false);
@@ -122,8 +115,12 @@ export default function DashboardPage() {
     void bootstrap();
   }, [router]);
 
-  const handleLogout = () => {
-    clearToken();
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch {
+      // best effort logout; user is redirected either way
+    }
     router.push("/auth/login");
   };
 

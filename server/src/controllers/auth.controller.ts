@@ -2,6 +2,16 @@ import { Request, Response } from "express";
 import { registerUser, loginUser } from "../services/auth.service";
 import prisma from "../config/prisma";
 
+const TOKEN_COOKIE_NAME = "interviewcraft_token";
+
+const getCookieConfig = () => ({
+  httpOnly: true,
+  sameSite: "lax" as const,
+  secure: process.env.NODE_ENV === "production",
+  path: "/",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+});
+
 export const register = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
@@ -20,10 +30,21 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
     const token = await loginUser(email, password);
-    res.json({ token });
+    res.cookie(TOKEN_COOKIE_NAME, token, getCookieConfig());
+    res.json({ ok: true });
   } catch (err: any) {
     res.status(401).json({ error: err.message });
   }
+};
+
+export const logout = async (_req: Request, res: Response) => {
+  res.clearCookie(TOKEN_COOKIE_NAME, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+  });
+  res.json({ ok: true });
 };
 
 export const me = async (req: Request, res: Response) => {

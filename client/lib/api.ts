@@ -1,5 +1,4 @@
 import axios from "axios";
-import { getToken } from "./auth";
 
 export type User = {
   id: string;
@@ -24,7 +23,6 @@ export type ChatMessage = {
 
 export type ChatDetail = {
   id: string;
-  userId: string;
   jobTitle: string;
   jobDescription: string;
   createdAt: string;
@@ -56,16 +54,7 @@ export type ResumeFeedback = {
 const baseURL =
   process.env.NEXT_PUBLIC_API_BASE_URL?.trim() || "http://localhost:5000/api";
 
-const client = axios.create({ baseURL });
-
-client.interceptors.request.use((config) => {
-  const token = getToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-
-  return config;
-});
+const client = axios.create({ baseURL, withCredentials: true });
 
 export const register = async (payload: {
   name: string;
@@ -76,8 +65,11 @@ export const register = async (payload: {
 };
 
 export const login = async (payload: { email: string; password: string }) => {
-  const { data } = await client.post<{ token: string }>("/auth/login", payload);
-  return data.token;
+  await client.post("/auth/login", payload);
+};
+
+export const logout = async () => {
+  await client.post("/auth/logout");
 };
 
 export const me = async () => {

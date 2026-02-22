@@ -34,8 +34,19 @@ export const getChatById = async (userId: string, chatId: string) => {
       id: chatId,
       userId, // ownership enforced here
     },
-    include: {
+    select: {
+      id: true,
+      jobTitle: true,
+      jobDescription: true,
+      createdAt: true,
+      updatedAt: true,
       messages: {
+        select: {
+          id: true,
+          role: true,
+          content: true,
+          createdAt: true,
+        },
         orderBy: { createdAt: "asc" },
       },
     },
