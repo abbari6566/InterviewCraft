@@ -19,3 +19,4 @@ suggests tailored answers, and provides feedback on practice responses.
 ## Try here:
 
 https://interview-craft-one.vercel.app/
+Note: This demo may no longer be accessible because the free-tier Render database has expired.
